@@ -141,6 +141,7 @@ void Common_Poll_Destory(void){
 
         for(int i=0; i< pool_size; i ++ ){
             pthread_cancel(threadPool[i]);
+            pthread_join(threadPool[i],NULL);
         }
     
         //回收线程池内存
