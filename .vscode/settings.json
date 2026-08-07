@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/atguigu/linux_app_0304",
+            "binaryPath": "/home/atguigu/linux_app_0304/main",
+            "binaryArgs": []
+        }
+    ]
+}
