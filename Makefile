@@ -2,6 +2,7 @@
 PARAM:=Common/cJSON.c
 PARAM+=Common/log.c
 PARAM+=driver/Driver_MQTT.c
+PARAM+=Common/Common_Pool.c
 
 INCLUDE_PATH:=-ICommon
 INCLUDE_PATH+=-Idriver
@@ -37,4 +38,9 @@ thread_lock: $(PARAM) test/thread_lock.c
 thread_queue: $(PARAM) test/thread_queue.c
 	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
 	-@./$@
+	-@rm -rf $@
+
+pool_test: $(PARAM) test/pool_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@sudo ./$@
 	-@rm -rf $@

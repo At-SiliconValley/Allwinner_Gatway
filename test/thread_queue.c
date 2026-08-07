@@ -67,5 +67,6 @@ int main(void){
     pthread_join(t2,NULL);
 
     //关闭队列
+    mq_close(res);
     mq_unlink("/my_queue");
 }
