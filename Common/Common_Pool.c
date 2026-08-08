@@ -25,7 +25,7 @@ void * execTask(void * args){
             //执行任务
             if(task.Func){
                 task.Func( task.args );
-            }
+            } 
         }
     }
 }
@@ -140,7 +140,9 @@ void Common_Poll_Destory(void){
     if(threadPool){
 
         for(int i=0; i< pool_size; i ++ ){
+            //结束线程
             pthread_cancel(threadPool[i]);
+            //等待线程结束,回收线程资源
             pthread_join(threadPool[i],NULL);
         }
     
