@@ -2,20 +2,48 @@
 
 int main(void){
     DoubleBuffer* buffer = NULL;
-    ComStatus status = Common_Buffer_CreateDoubleBuffer(&buffer, 10);
+    ComStatus status = Common_Buffer_CreateDoubleBuffer(&buffer, 50);
 
     if(status == COM_FAIL){
         log_info("缓冲创建失败");
         return 1;
     }
 
-    SubBuffer* writeBuffer = buffer->buf_arr[ buffer->write_index ];
-    writeBuffer->buf[writeBuffer->used_len] = 'A';
+    Common_Buffer_Write(buffer, "hello",5);
+    Common_Buffer_Write(buffer, "hadoop",6);
+    Common_Buffer_Write(buffer, "java",4);
 
-    log_info("-=========>%c",writeBuffer->buf[writeBuffer->used_len]);
+    char* datas = NULL;
+    uint16_t size = 0;
+    Common_Buffer_Read(buffer, &datas,&size);
 
-    SubBuffer* readBuffer = buffer->buf_arr[ buffer->read_index ];
-    readBuffer->buf[readBuffer->used_len] = 'B';
+    if(size != 0){
 
-    log_info("-=========>%c",readBuffer->buf[readBuffer->used_len]);
+        log_info("1读取数据长度:%d 数据:%s",size,datas);
+
+        free(datas);
+        
+    }
+
+    Common_Buffer_Read(buffer, &datas,&size);
+
+    if(size != 0){
+
+        log_info("2读取数据长度:%d 数据:%s",size,datas);
+
+        free(datas);
+        
+    }
+
+    Common_Buffer_Read(buffer, &datas,&size);
+
+    if(size != 0){
+
+        log_info("3读取数据长度:%d 数据:%s",size,datas);
+
+        free(datas);
+        
+    }
+
+    Common_Buffer_Destory(buffer);
 }

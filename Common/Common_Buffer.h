@@ -37,7 +37,7 @@ ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer** buffer,  uint16_t size
  * @param size 读取的数据的大小
  * @return ComStatus 
  */
-ComStatus Common_Buffer_Read( DoubleBuffer* buffer, char* datas, uint16_t* size  );
+ComStatus Common_Buffer_Read( DoubleBuffer* buffer, char** datas, uint16_t* size  );
 /**
  * @brief 将数据写入指定缓冲
  * 
