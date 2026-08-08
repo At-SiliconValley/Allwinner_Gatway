@@ -4,6 +4,7 @@ PARAM+=Common/log.c
 PARAM+=driver/Driver_MQTT.c
 PARAM+=Common/Common_Pool.c
 PARAM+=Common/Common_Buffer.c
+PARAM+=driver/Driver_Modbus.c
 
 INCLUDE_PATH:=-ICommon
 INCLUDE_PATH+=-Idriver
@@ -48,5 +49,14 @@ pool_test: $(PARAM) test/pool_test.c
 
 buffer_test: $(PARAM) test/buffer_test.c
 	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
+
+modbus_slave: $(PARAM) test/modbus_slave_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
+modbus_master: $(PARAM) test/modbus_master_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
 	-@./$@
 	-@rm -rf $@
