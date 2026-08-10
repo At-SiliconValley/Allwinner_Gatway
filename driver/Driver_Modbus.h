@@ -1,8 +1,8 @@
 #ifndef __DRIVER_MODBUS_H__
 #define __DRIVER_MODBUS_H__
-#include "Common_Config.h"
+#include "../Common/Common_Config.h"
 #include "modbus/modbus.h"
-#include "log.h"
+#include "../Common/log.h"
 
 ComStatus Driver_Modbus_Init(void);
 
