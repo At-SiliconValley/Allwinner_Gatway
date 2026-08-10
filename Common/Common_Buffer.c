@@ -1,4 +1,6 @@
 #include "Common_Buffer.h"
+#include <string.h>
+#include <stdlib.h>
 
 /**
  * @brief 创建双缓冲
@@ -27,7 +29,19 @@
  */
 ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer** buffer, uint16_t size)
 {
-    // TODO: 按照上述步骤实现双缓冲创建
+    if (size > 0) {
+        return 0;
+    }
+    SubBuffer subbuffer;
+    malloc(sizeof(SubBuffer));
+    malloc(sizeof(subbuffer.buf));
+    memset(subbuffer.buf, 0, sizeof(subbuffer.buf));
+    subbuffer.size = size;
+
+    DoubleBuffer doublebuffer;
+    malloc(sizeof(doublebuffer));
+    doublebuffer.buf_arr[0] = readBuffer;
+    doublebuffer.buf_arr[1] = writeBuffer;
 
     return COM_FAIL; // 临时返回值，实现后改成 COM_OK
 }

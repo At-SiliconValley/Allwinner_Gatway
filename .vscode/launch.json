@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/ziyun/Documents/Allwinner_Gatway",
-      "program": "/home/ziyun/Documents/Allwinner_Gatway/build/Debug/outDebug",
+      "cwd": "/home/ziyun/Documents/Allwinner_Gatway/Common",
+      "program": "/home/ziyun/Documents/Allwinner_Gatway/Common/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
