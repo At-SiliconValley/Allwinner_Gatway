@@ -122,18 +122,18 @@ ComStatus Common_Buffer_Read( DoubleBuffer* buffer, char** datas, uint16_t* size
     //3、检查读缓存是否有数据
     SubBuffer* readBuffer = buffer->buf_arr[buffer->read_index];
     if( readBuffer->used_len == 0 ){
-        log_info("读缓冲没有数据,准备切换缓冲");
+        //log_info("读缓冲没有数据,准备切换缓冲");
         //4、如果没数据,交换缓冲
         //4.1、上写锁
         pthread_mutex_lock(&buffer->writeLock);
         //4.2、交换缓冲
         buffer->read_index = !buffer->read_index;
         buffer->write_index = !buffer->write_index;
-        log_info("读写缓冲切换完成");
+        //log_info("读写缓冲切换完成");
         //4.3、判断交换缓冲之后,读缓冲是否有数据,如果没有返回,如果有代码向下执行
         readBuffer = buffer->buf_arr[buffer->read_index];
         if(readBuffer->used_len == 0){
-            log_info("切换之后读缓存还是没有数据");
+            //log_info("切换之后读缓存还是没有数据");
             pthread_mutex_unlock(&buffer->writeLock);
             pthread_mutex_unlock(&buffer->readLock);
             return COM_FAIL;
@@ -141,7 +141,7 @@ ComStatus Common_Buffer_Read( DoubleBuffer* buffer, char** datas, uint16_t* size
         //4.4、释放写锁
         pthread_mutex_unlock(&buffer->writeLock);
     }
-    log_info("准备读取数据");
+    //log_info("准备读取数据");
     //5、如果有数据,直接读取
     //5.1、读取数据长度
     *size = (readBuffer->buf[0] << 8) | readBuffer->buf[1];
@@ -155,7 +155,8 @@ ComStatus Common_Buffer_Read( DoubleBuffer* buffer, char** datas, uint16_t* size
     readBuffer->used_len -= *size ;
     //7、释放读锁
     pthread_mutex_unlock(&buffer->readLock);
-    log_info("读取完成");
+    //log_info("读取完成");
+    return COM_OK;
 
 }
 /**
@@ -191,6 +192,8 @@ ComStatus Common_Buffer_Write( DoubleBuffer* buffer,char* datas, uint16_t size  
     writeBuffer->used_len += size;
     //x、释放锁
     pthread_mutex_unlock(&buffer->writeLock);
+    log_info("写入完成");
+    return COM_OK;
 }
 
 /**

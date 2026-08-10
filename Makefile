@@ -5,9 +5,11 @@ PARAM+=driver/Driver_MQTT.c
 PARAM+=Common/Common_Pool.c
 PARAM+=Common/Common_Buffer.c
 PARAM+=driver/Driver_Modbus.c
+PARAM+=App/App_Application.c
 
 INCLUDE_PATH:=-ICommon
 INCLUDE_PATH+=-Idriver
+INCLUDE_PATH+=-IApp
 #json模块测试
 json_test: $(PARAM) test/Cjson_Test.c
 	-@gcc $^ -ICommon -o $@
@@ -57,6 +59,16 @@ modbus_slave: $(PARAM) test/modbus_slave_test.c
 	-@./$@
 	-@rm -rf $@
 modbus_master: $(PARAM) test/modbus_master_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
+
+float2U16: $(PARAM) test/Float2U16.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
+
+main: $(PARAM) main.c
 	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
 	-@./$@
 	-@rm -rf $@

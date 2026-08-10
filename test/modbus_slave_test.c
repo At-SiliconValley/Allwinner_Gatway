@@ -3,7 +3,7 @@
 int main(void){
 
     //1、创建rtu modbus
-    modbus_t * ctx = modbus_new_rtu("/dev/pts/0",115200,'N', 8 , 1);
+    modbus_t * ctx = modbus_new_rtu("/dev/pts/2",115200,'N', 8 , 1);
     if(ctx == NULL){
         perror("modbus ctx create fail");
         return 1;
