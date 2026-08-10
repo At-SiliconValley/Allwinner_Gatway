@@ -5,7 +5,7 @@ static modbus_t *ctx;
 ComStatus Driver_Modbus_Init(void)
 {
     // 1、创建modbus rtu 上下文
-    ctx = modbus_new_rtu("/dev/pts/4", 115200, 'N', 8, 1);
+    ctx = modbus_new_rtu("/dev/ttyS1", 115200, 'N', 8, 1);
 
     if (ctx == NULL)
     {

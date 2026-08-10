@@ -1,1 +1,4 @@
-toolchain/
+/sysroot/
+*.o
+/output/
+/toolchain/

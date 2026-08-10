@@ -5,6 +5,7 @@
 #include "Common_Buffer.h"
 #include "Driver_Modbus.h"
 #include "cJSON.h"
+#include "signal.h"
 
 void App_Application_Run(void);
 

@@ -2,6 +2,7 @@
 
 static DoubleBuffer* upBuffer;
 static DoubleBuffer* downBuffer;
+static bool app_isrunning = true;
 
 static void App_Application_MQTTReceiveHandle( int len, char* datas);
 static  void App_Application_UpTaskFunc(void* args);
@@ -88,11 +89,32 @@ static void App_Application_Init(void){
 
 }
 
+void App_Application_Exit(int code){
+    log_info("捕捉到信号:%d",code);
+    app_isrunning = false;
+}
+
 void App_Application_Run(void){
 
     App_Application_Init();
 
-    while(1);
+    //捕获信号
+    signal(SIGINT,App_Application_Exit);
+    signal(SIGTERM,App_Application_Exit);
+
+    while(app_isrunning){
+        //进入阻塞状态,一旦检测到信号之后开始运行
+        pause();
+    }
+
+    //回收资源
+    log_info("准备回收资源");
+    Common_Buffer_Destory(upBuffer);
+    Common_Buffer_Destory(downBuffer);
+    Driver_Modbus_Destory();
+    Driver_MQTT_Deinit();
+    Common_Poll_Destory();
+
 }
 
 /**
@@ -112,7 +134,7 @@ static void App_Application_MQTTReceiveHandle( int len, char* datas){
 static  void App_Application_UpTaskFunc(void* args){
 
     while(1){
-
+        //log_info("task1 running....");
         //从上行缓冲读取数据
         char* datas = NULL;
         uint16_t size = 0;
@@ -122,6 +144,11 @@ static  void App_Application_UpTaskFunc(void* args){
             log_info("从上行缓冲区获取到数据:%s",datas);
             //通过MQTT发走
             Driver_MQTT_Send(PUSH_TOPIC, datas, size);
+            if(datas){
+
+                free(datas);
+                datas = NULL;
+            }
         }
     }
 }
@@ -140,7 +167,7 @@ static  void App_Application_UpTaskFunc(void* args){
 static  void App_Application_DownTaskFunc(void* args){
 
     while(1){
-
+        //log_info("task2 running....");
         //1、读取下行缓冲的数据
         char* datas = NULL;
         uint16_t size = 0;
@@ -212,6 +239,11 @@ static  void App_Application_DownTaskFunc(void* args){
     
     
             cJSON_Delete(root);
+            if(datas){
+
+                free(datas);
+                datas = NULL;
+            }
         }
     }
 

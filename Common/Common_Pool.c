@@ -131,6 +131,7 @@ void Common_Poll_Destory(void){
 
     //销毁队列
     if(mqid!=-1){
+        log_info("关闭队列");
         mq_close(mqid);
         mq_unlink(POOL_QUEUE_NAME);
         mqid = -1;
@@ -138,14 +139,14 @@ void Common_Poll_Destory(void){
 
     //取消线程
     if(threadPool){
-
+        log_info("取消线程");
         for(int i=0; i< pool_size; i ++ ){
             //结束线程
             pthread_cancel(threadPool[i]);
             //等待线程结束,回收线程资源
             pthread_join(threadPool[i],NULL);
         }
-    
+        log_info("线程取消完成");
         //回收线程池内存
         free(threadPool);
         threadPool = NULL;
