@@ -1,6 +1,7 @@
 #ifndef __COMMON_CONFIG_H__
 #define __COMMON_CONFIG_H__
 #include "log.h"
+#include "assert.h"
 #include "unistd.h"
 #include "stdint.h"
 typedef enum{
