@@ -1,6 +1,10 @@
 #include "Common_Pool.h"
-#include <stddef.h>
+#include "Common_Config.h"
+#include <fcntl.h>
 #include <mqueue.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define POOL_QUEUE_NAME "/pool_queue"
@@ -56,7 +60,20 @@ void *execTask(void *args) {
  */
 static ComStatus Common_Poll_CreateQueue(int size) {
   // TODO: 按照上述步骤实现消息队列创建
-    
+  mq_unlink(POOL_QUEUE_NAME);
+
+  mq_attr attr = {
+      .mq_curmsgs = 0,
+      .mq_flags = 0,
+      .mq_maxmsg = size,
+      .mq_msgsize = sizeof(Task),
+  };
+
+  int mq_res = mq_open(POOL_QUEUE_NAME, O_RDWR | O_CREAT, 0666, &attr);
+  if (mq_res == -1) {
+    perror("mq create faild\n");
+  }
+
   return COM_FAIL; // 临时返回值
 }
 
@@ -77,6 +94,12 @@ static ComStatus Common_Poll_CreateQueue(int size) {
  */
 ComStatus Common_Poll_Create(int size) {
   // TODO: 按照上述步骤实现线程池创建
+  if (size > 0) {
+    pool_size = size;
+    Common_Poll_CreateQueue(size);
+    malloc(sizeof(&threadPool));
+    memset(threadPool, 0, sizeof(threadPool));
+  }
 
   return COM_FAIL; // 临时返回值
 }
@@ -95,7 +118,13 @@ ComStatus Common_Poll_Create(int size) {
  */
 ComStatus Common_Poll_AddTask(Task *task) {
   // TODO: 按照上述步骤实现任务添加
-
+  if (task != NULL) {
+    if (mq_send(mqid, (char *)task, sizeof(Task), 0) == 0) {
+      return COM_FAIL;
+    } else {
+      return COM_OK;
+    }
+  }
   return COM_FAIL; // 临时返回值
 }
 
@@ -116,4 +145,6 @@ ComStatus Common_Poll_AddTask(Task *task) {
  */
 void Common_Poll_Destory(void) {
   // TODO: 按照上述步骤实现资源回收
+  
+
 }
