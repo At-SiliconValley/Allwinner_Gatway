@@ -1,14 +1,25 @@
+
 #include "Common_Buffer.h"
-#include <string.h>
+#include "Common_Config.h"
+#include <pthread.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define RETURN_IF_ERROR(expr)                                                  \
+  do {                                                                         \
+    ComStatus _st = (expr);                                                    \
+    if (_st != COM_OK) {                                                       \
+      return _st                                                               \
+    }                                                                          \
+  } while (0)
 
 /**
  * @brief 创建双缓冲
- * 
+ *
  * @param buffer 创建的缓冲的指针（输出参数）
  * @param size   每个子缓冲的大小
  * @return ComStatus COM_OK 成功 / COM_FAIL 失败
- * 
+ *
  * 实现步骤：
  *   1、校验参数：size 必须 > 0
  *   2、创建读缓冲 SubBuffer：
@@ -24,36 +35,36 @@
  *     5.1、pthread_mutex_init 创建 readLock
  *     5.2、pthread_mutex_init 创建 writeLock
  *   6、*buffer = doubleBuffer，返回 COM_OK
- * 
+ *
  * 注意：每一步失败都要释放已申请的资源，防止内存泄漏
  */
-ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer** buffer, uint16_t size)
-{
-    if (size > 0) {
-        return 0;
-    }
-    SubBuffer subbuffer;
-    malloc(sizeof(SubBuffer));
-    malloc(sizeof(subbuffer.buf));
-    memset(subbuffer.buf, 0, sizeof(subbuffer.buf));
-    subbuffer.size = size;
+ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer **buffer,
+                                           uint16_t size) {
+  if (size > 0) {
+    return 0;
+  }
+  SubBuffer subbuffer;
+  malloc(sizeof(SubBuffer));
+  malloc(sizeof(subbuffer.buf));
+  memset(subbuffer.buf, 0, sizeof(subbuffer.buf));
+  subbuffer.size = size;
 
-    DoubleBuffer doublebuffer;
-    malloc(sizeof(doublebuffer));
-    doublebuffer.buf_arr[0] = readBuffer;
-    doublebuffer.buf_arr[1] = writeBuffer;
+  DoubleBuffer doublebuffer;
+  malloc(sizeof(doublebuffer));
+  doublebuffer.buf_arr[0] = readBuffer;
+  doublebuffer.buf_arr[1] = writeBuffer;
 
-    return COM_FAIL; // 临时返回值，实现后改成 COM_OK
+  return COM_FAIL; // 临时返回值，实现后改成 COM_OK
 }
 
 /**
  * @brief 从指定缓冲中读取数据
- * 
+ *
  * @param buffer 待读取数据的缓冲
  * @param datas  读取到的数据（输出参数，内部 malloc，调用者需 free）
  * @param size   读取到的数据大小（输出参数）
  * @return ComStatus COM_OK 成功 / COM_FAIL 失败
- * 
+ *
  * 实现步骤：
  *   1、参数校验：buffer / datas / size 不能为 NULL
  *   2、初始化 *size = 0, *datas = NULL
@@ -75,21 +86,21 @@ ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer** buffer, uint16_t size)
  *   7、将剩余数据向前移动（memmove），更新 used_len
  *   8、释放读锁，返回 COM_OK
  */
-ComStatus Common_Buffer_Read(DoubleBuffer* buffer, char** datas, uint16_t* size)
-{
-    // TODO: 按照上述步骤实现数据读取
+ComStatus Common_Buffer_Read(DoubleBuffer *buffer, char **datas,
+                             uint16_t *size) {
+  // TODO: 按照上述步骤实现数据读取
 
-    return COM_FAIL; // 临时返回值
+  return COM_FAIL; // 临时返回值
 }
 
 /**
  * @brief 将数据写入指定缓冲
- * 
+ *
  * @param buffer 待写入数据的缓冲
  * @param datas  待写入数据
  * @param size   数据大小
  * @return ComStatus COM_OK 成功 / COM_FAIL 失败
- * 
+ *
  * 实现步骤：
  *   1、参数校验：buffer / datas 不能为 NULL，size 不能为 0
  *   2、上写锁 pthread_mutex_lock(&buffer->writeLock)
@@ -105,18 +116,23 @@ ComStatus Common_Buffer_Read(DoubleBuffer* buffer, char** datas, uint16_t* size)
  *      5.5、used_len += size
  *   6、释放写锁，返回 COM_OK
  */
-ComStatus Common_Buffer_Write(DoubleBuffer* buffer, char* datas, uint16_t size)
-{
-    // TODO: 按照上述步骤实现数据写入
+ComStatus Common_Buffer_Write(DoubleBuffer *buffer, char *datas,
+                              uint16_t size) {
+  if (buffer != NULL && datas != NULL && size != 0) {
+    pthread_mutex_lock(&buffer->buf_arr[buffer->write_index]);
+    if (writeBu) {
+    
+    }
+  }
 
-    return COM_FAIL; // 临时返回值
+  return COM_FAIL; // 临时返回值
 }
 
 /**
  * @brief 回收缓冲资源
- * 
+ *
  * @param buffer 待销毁的双缓冲
- * 
+ *
  * 实现步骤：
  *   1、如果 buffer == NULL，直接 return
  *   2、释放 buf_arr[0]->buf，释放 buf_arr[0]
@@ -125,7 +141,6 @@ ComStatus Common_Buffer_Write(DoubleBuffer* buffer, char* datas, uint16_t size)
  *   5、pthread_mutex_destroy 销毁 readLock
  *   6、free(buffer)
  */
-void Common_Buffer_Destory(DoubleBuffer* buffer)
-{
-    // TODO: 按照上述步骤实现资源回收
+void Common_Buffer_Destory(DoubleBuffer *buffer) {
+  // TODO: 按照上述步骤实现资源回收
 }

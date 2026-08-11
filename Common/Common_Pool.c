@@ -1,7 +1,9 @@
 #include "Common_Pool.h"
 #include "Common_Config.h"
+#include <stddef.h>
 #include <fcntl.h>
 #include <mqueue.h>
+#include <pthread.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,6 +147,18 @@ ComStatus Common_Poll_AddTask(Task *task) {
  */
 void Common_Poll_Destory(void) {
   // TODO: 按照上述步骤实现资源回收
-  
+  if (mqid != -1) {
+    mq_close(mqid);
+    mq_unlink(POOL_QUEUE_NAME);
+    mqid = -1;
+  }
+  if (threadPool != NULL) {
+    for (size_t i; i < pool_size; i++) {
+      pthread_cancel(threadPool[i]);
+      pthread_join(threadPool[i], NULL);
+      free(threadPool);
+      threadPool = NULL;
+    }
+  }
 
 }
