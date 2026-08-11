@@ -1,0 +1,5 @@
+/sysroot/
+*.o
+/output/
+/toolchain/
+teacher_repo/
