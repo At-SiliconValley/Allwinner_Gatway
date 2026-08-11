@@ -33,6 +33,10 @@ void *execTask(void *args) {
   // TODO: 按照上述步骤实现线程执行逻辑
   Task task;
   while (1) {
+    // ⚠️ 【错误15】mq_receive 返回 ssize_t（有符号），不是 size_t（无符号）
+    //          用 size_t 接收时，错误返回值 -1 会被转成 SIZE_MAX (18446744073709551615)
+    //          导致 sz == sizeof(Task) 永远不会匹配错误情况
+    //          正确写法：ssize_t sz = mq_receive(mqid, (char *)&task, sizeof(Task), NULL);
     size_t sz = mq_receive(mqid, (char *)&task, sizeof(Task), NULL);
     if (sz == sizeof(Task)) {
       if (task.Func != NULL) {

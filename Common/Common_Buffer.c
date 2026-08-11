@@ -54,6 +54,34 @@ ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer **buffer,
   malloc(sizeof(doublebuffer));
   doublebuffer.buf_arr[0] = readBuffer;
   doublebuffer.buf_arr[1] = writeBuffer;
+ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer** buffer, uint16_t size)
+{
+    // ⚠️ 【错误1】逻辑反了：size > 0 是合法输入，应该校验 size == 0 时返回 COM_FAIL
+    //          而且 return 0 是 int，不是 ComStatus 枚举值，应该用 COM_FAIL
+    if (size > 0) {
+        return 0;
+    }
+    // ⚠️ 【错误2】subbuffer 是栈上的局部变量（不是指针），应该用 malloc 分配 SubBuffer* 指针
+    //          正确写法：SubBuffer* readBuffer = (SubBuffer*)malloc(sizeof(SubBuffer));
+    //          需要两个独立的指针：readBuffer 和 writeBuffer
+    SubBuffer subbuffer;
+    // ⚠️ 【错误3】malloc 返回值没有接收！分配的内存直接泄漏了
+    malloc(sizeof(SubBuffer));
+    // ⚠️ 【错误4】sizeof(subbuffer.buf) 取的是 char* 指针大小（8字节），不是传入的 size
+    //          正确写法：readBuffer->buf = (char*)malloc(size);
+    malloc(sizeof(subbuffer.buf));
+    // ⚠️ 【错误5】buf 还没分配内存，memset 操作的是野指针；sizeof(subbuffer.buf) 也是 8 字节
+    memset(subbuffer.buf, 0, sizeof(subbuffer.buf));
+    // ⚠️ 【错误6】subbuffer 是结构体不是指针，但这里应该用指针操作
+    subbuffer.size = size;
+
+    // ⚠️ 【错误7】doublebuffer 又是栈变量，应该用 malloc 分配指针
+    DoubleBuffer doublebuffer;
+    // ⚠️ 【错误8】malloc 返回值又没有接收
+    malloc(sizeof(doublebuffer));
+    // ⚠️ 【错误9】readBuffer 和 writeBuffer 从未声明！编译会报错
+    doublebuffer.buf_arr[0] = readBuffer;
+    doublebuffer.buf_arr[1] = writeBuffer;
 
   return COM_FAIL; // 临时返回值，实现后改成 COM_OK
 }

@@ -40,6 +40,8 @@ void Driver_MQTT_ConnectionLost(void *context, char *cause) {
 
     int cnt_res = MQTTClient_connect(client, &conn_opts);
 
+    // ⚠️ 【错误1】do-while 逻辑错误：即使连接成功也会 sleep(60) 才退出
+    //          应该用递增退避策略：if (失败) { time++; sleep(time); continue; }
     do {
       sleep(60);
     } while (cnt_res != MQTTCLIENT_SUCCESS);
@@ -47,6 +49,8 @@ void Driver_MQTT_ConnectionLost(void *context, char *cause) {
     int sub_res =
         MQTTClient_subscribe(client, PULL_TOPIC, MQTTREASONCODE_GRANTED_QOS_0);
 
+    // ⚠️ 【错误2】C 不能链式比较 a==b==c！会解析为 (a==b)==c，逻辑完全错误
+    //          正确写法：cnt_res == MQTTCLIENT_SUCCESS && sub_res == MQTTCLIENT_SUCCESS
     if (cnt_res == sub_res == MQTTCLIENT_SUCCESS) {
       break;
     }
@@ -73,7 +77,10 @@ int Driver_MQTT_MessageArrived(void *context, char *topicName, int topicLen,
                                MQTTClient_message *message) {
   // TODO: 按照上述步骤实现消息接收回调
   if (receiveHandle != NULL) {
+    // ⚠️ 【错误3】第一个参数传错了：应该传 message->payloadlen（消息长度），不是 message->payload
+    //          正确：receiveHandle(message->payloadlen, (char*)message->payload);
     receiveHandle(message->payload, (char *) message->payload);
+    // ⚠️ 【错误4】freeMessage 和 free 应该放在 if 外面，否则 receiveHandle 为 NULL 时会内存泄漏
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
   }
@@ -90,7 +97,7 @@ int Driver_MQTT_MessageArrived(void *context, char *topicName, int topicLen,
  *   - log_info 打印 "消息发送完成"
  */
 void Driver_MQTT_DeliveryComplete(void *context, MQTTClient_deliveryToken dt) {
-  // TODO: 按照上述步骤实现发送完成回调
+  // ⚠️ 【提示】log_info 已自动换行，不需要 \n；建议和老师保持一致："消息发送完成"
   log_info("Message send Success!\n");
 }
 /**
@@ -120,9 +127,11 @@ void Driver_MQTT_DeliveryComplete(void *context, MQTTClient_deliveryToken dt) {
  * 注意：MQTT_SERVER_URL 和 PULL_TOPIC 在 Common_Config.h 中定义
  */
 ComStatus Driver_MQTT_Init(MqttReceiveCallback rcb) {
-  // TODO: 按照上述步骤实现 MQTT 初始化
     receiveHandle = rcb;
+    // ⚠️ 【错误5】MQTTClient_create 的返回值没有检查！
+    //          正确：int res = MQTTClient_create(...); if (res != MQTTCLIENT_SUCCESS) { return COM_FAIL; }
     MQTTClient_create(&client, MQTT_SERVER_URL, "app_mqtt", MQTTCLIENT_PERSISTENCE_NONE, NULL);
+    // ⚠️ 【错误6】缺少关键步骤：conn_opts 设置、setCallbacks 注册回调、connect 连接、subscribe 订阅
   return COM_FAIL; // 临时返回值
 }
 
@@ -139,7 +148,8 @@ ComStatus Driver_MQTT_Init(MqttReceiveCallback rcb) {
  *         MQTTREASONCODE_GRANTED_QOS_0, 0, NULL) 发送消息
  */
 void Driver_MQTT_Send(char *topicName, char *datas, int len) {
-  // TODO: 按照上述步骤实现消息发送
+  // ⚠️ 【错误7】| 是位或运算符，应该用 || 逻辑或；len < 0 应为 len <= 0
+  //          正确：if (topicName == NULL || datas == NULL || len <= 0 || client == NULL) { return; }
   if (!(topicName == NULL | datas == NULL | len < 0 | client == NULL)) {
     MQTTClient_publish(client, topicName, len, datas, MQTTREASONCODE_GRANTED_QOS_0, 0, NULL);
 }
