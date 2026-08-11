@@ -101,7 +101,17 @@ ComStatus Common_Buffer_Read(DoubleBuffer *buffer, char **datas,
   pthread_mutex_lock(&buffer->readLock);
 
   // ❌ readbuffer = buffer->buf_arr[...];              // 没声明类型
-  SubBuffer* readbuffer = buffer->buf_arr[buffer->read_index];
+  SubBuffer* readbuffer = buffer->buf_arr[buffer->read_index];   //
+  //**
+  // why buf_arr[buffer->read_index] instead of buf_arr[0] ?
+  // when zhe read_index = 1,means a process is reading this arr,so :
+  //        think about: 
+  //            there is two buf_arr :    
+  //          buf_arr[0]
+  //          buf_arr[1]
+  //      and:  
+  //          when the read_index is 1, the buf_arr[0]     
+  //  */
 
   // ❌ if () {                                        // 条件不完整
   if (readbuffer->used_len == 0) {
