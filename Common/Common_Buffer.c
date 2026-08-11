@@ -1,6 +1,7 @@
 
 #include "Common_Buffer.h"
 #include "Common_Config.h"
+#include "cJSON.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,7 +90,15 @@ ComStatus Common_Buffer_CreateDoubleBuffer(DoubleBuffer **buffer,
 ComStatus Common_Buffer_Read(DoubleBuffer *buffer, char **datas,
                              uint16_t *size) {
   // TODO: 按照上述步骤实现数据读取
-
+  if (buffer != NULL && datas != NULL && size != NULL) {
+    *size = 0;
+    *datas = NULL;
+    pthread_mutex_lock(&buffer->readLock);
+    readBuffer = buffer->buf_arr[buffer->read_index];
+    if () {
+    
+    }
+  }
   return COM_FAIL; // 临时返回值
 }
 
@@ -120,9 +129,11 @@ ComStatus Common_Buffer_Write(DoubleBuffer *buffer, char *datas,
                               uint16_t size) {
   if (buffer != NULL && datas != NULL && size != 0) {
     pthread_mutex_lock(&buffer->buf_arr[buffer->write_index]);
-    if () {
-    
+    if (writeBuffer.size) {
+
+      return COM_FAIL;
     }
+    buf
   }
 
   return COM_FAIL; // 临时返回值
@@ -143,8 +154,7 @@ ComStatus Common_Buffer_Write(DoubleBuffer *buffer, char *datas,
  */
 void Common_Buffer_Destory(DoubleBuffer *buffer) {
   // TODO: 按照上述步骤实现资源回收
-  if(buffer == NULL)
-  {
+  if (buffer == NULL) {
     return;
   }
   free(buf_arr[0]->buf);
