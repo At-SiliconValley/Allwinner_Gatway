@@ -120,7 +120,7 @@ ComStatus Common_Buffer_Write(DoubleBuffer *buffer, char *datas,
                               uint16_t size) {
   if (buffer != NULL && datas != NULL && size != 0) {
     pthread_mutex_lock(&buffer->buf_arr[buffer->write_index]);
-    if (writeBu) {
+    if () {
     
     }
   }
@@ -143,4 +143,13 @@ ComStatus Common_Buffer_Write(DoubleBuffer *buffer, char *datas,
  */
 void Common_Buffer_Destory(DoubleBuffer *buffer) {
   // TODO: 按照上述步骤实现资源回收
+  if(buffer == NULL)
+  {
+    return;
+  }
+  free(buf_arr[0]->buf);
+  free(buf_arr[1]->buf);
+  pthread_mutex_destory();
+  pthread_mutex_destory(readLock);
+  free(buffer);
 }
