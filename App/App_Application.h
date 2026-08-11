@@ -6,6 +6,7 @@
 #include "Driver_Modbus.h"
 #include "cJSON.h"
 #include "signal.h"
+#include "Common_Config.h"
 
 void App_Application_Run(void);
 

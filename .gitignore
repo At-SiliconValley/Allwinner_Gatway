@@ -2,3 +2,5 @@
 *.o
 /output/
 /toolchain/
+/server/
+/.vscode/

@@ -1,6 +1,0 @@
-hello java
-hello hadoop
-hello word
-abc hello
-12423432
-245345435

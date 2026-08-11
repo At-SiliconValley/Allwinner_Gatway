@@ -64,7 +64,6 @@ ComStatus Driver_Http_GetJson(char *url, MemoryBuffer *mem)
 
         // 发起请求
         res = curl_easy_perform(curl);
-
         if (res != CURLE_OK)
         {
             perror("请求json文件失败");
