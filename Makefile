@@ -6,6 +6,7 @@ PARAM+=Common/Common_Pool.c
 PARAM+=Common/Common_Buffer.c
 PARAM+=driver/Driver_Modbus.c
 PARAM+=App/App_Application.c
+PARAM+=driver/Driver_Http.c
 
 INCLUDE_PATH:=-ICommon
 INCLUDE_PATH+=-Idriver
@@ -74,6 +75,11 @@ main: $(PARAM) main.c
 	-@rm -rf $@
 
 io_test: $(PARAM) test/io_test.c
-	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -lcurl -o $@
 	-@./$@
 	-@rm -rf $@
+
+http_test: $(PARAM) test/http_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -lcurl -o $@
+	-@./$@
+#-@rm -rf $@
