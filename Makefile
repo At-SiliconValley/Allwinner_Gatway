@@ -1,65 +1,79 @@
-CC:=$(CROSS_COMPILE)gcc
 
-BOARD_DIR := $(shell pwd)/
-#改为自己开发板的ip地址
-PEER := root@192.168.50.40
+PARAM:=Common/cJSON.c
+PARAM+=Common/log.c
+PARAM+=driver/Driver_MQTT.c
+PARAM+=Common/Common_Pool.c
+PARAM+=Common/Common_Buffer.c
+PARAM+=driver/Driver_Modbus.c
+PARAM+=App/App_Application.c
 
-CFLAGS += -Wall -Wextra
+INCLUDE_PATH:=-ICommon
+INCLUDE_PATH+=-Idriver
+INCLUDE_PATH+=-IApp
+#json模块测试
+json_test: $(PARAM) test/Cjson_Test.c
+	-@gcc $^ -ICommon -o $@
+	-@./$@
+	-@rm -rf $@
 
-CFLAGS += -I.
-CFLAGS += -IApp
-CFLAGS += -ICommon
-CFLAGS += -Idriver
-# CFLAGS += -Iota
+#-I: 设置include目录
+#日志模块测试
+log_test: $(PARAM) test/log_test.c
+	-@gcc $^ -ICommon -o $@
+	-@./$@
+	-@rm -rf $@
 
-ifdef SYSROOT
-	CFLAGS += --sysroot=$(SYSROOT)
-endif
+#-l: 连接指定库
+mqtt_test: $(PARAM) test/mqtt_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
 
-LDLIBS += -lpaho-mqtt3c
-# LDLIBS += -lcurl
-# LDLIBS += -lcrypto
-LDLIBS += -lmodbus
-#modbus文件路径,toolchain前面的路径需要改为自己的工程路径
-# LDLIBS += -L/home/shtos/桌面/01_Projects/485_gateway/toolchain/arm-linux-gnueabihf/lib
+thread_test: $(PARAM) test/thread_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
 
-SRC += $(shell find App -name "*.c" -type f)
-SRC += $(shell find Common -name "*.c" -type f)
-SRC += $(shell find driver -name "*.c" -type f)
-# SRC += $(shell find thirdparty -name "*.c" -type f)
+thread_lock: $(PARAM) test/thread_lock.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
 
-OBJ := $(SRC:.c=.o)
+thread_queue: $(PARAM) test/thread_queue.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
 
-TARGET := gateway
+pool_test: $(PARAM) test/pool_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@sudo ./$@
+	-@rm -rf $@
 
-.PHONY: all, clean
+buffer_test: $(PARAM) test/buffer_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -o $@
+	-@./$@
+	-@rm -rf $@
 
-all: $(TARGET)
+modbus_slave: $(PARAM) test/modbus_slave_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
+modbus_master: $(PARAM) test/modbus_master_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
 
-clean:
-	@-rm -f $(TARGET) $(OBJ) main.o
-$(TARGET): main.o $(OBJ)
-	@-$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+float2U16: $(PARAM) test/Float2U16.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
 
-cross-compile:
-	@CROSS_COMPILE=$(BOARD_DIR)/toolchain/bin/arm-linux-gnueabihf- \
-	SYSROOT=$(BOARD_DIR)/sysroot \
-	make -j16
-	@scp -O $(TARGET) $(PEER):/usr/bin/$(TARGET)
-	@ssh -t $(PEER) /usr/bin/$(TARGET)
+main: $(PARAM) main.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
 
-cross-init:
-	@scp -O init/S99gateway $(PEER):/etc/init.d/S99gateway
-
-%.o: %.c
-	@-$(CC) $(CFLAGS) -c $^ -o $@
-
-%_test: test/%_test.o $(OBJ)
-	@-$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
-	@-./$@
-	@-rm $@ $^
-
-#./表示让系统在当前目录(GATEWAY_SHT)下查找这个程序
-# $^表示所有依赖文件，即所有的.o文件
-# $@表示目标(target)文件，即可执行文件
-# -I表示在编译时添加头文件搜索路径
+io_test: $(PARAM) test/io_test.c
+	-@gcc $^ $(INCLUDE_PATH) -lpaho-mqtt3c -lmodbus -o $@
+	-@./$@
+	-@rm -rf $@
