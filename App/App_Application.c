@@ -1,4 +1,5 @@
 #include "App_Application.h"
+#include <bits/posix1_lim.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -142,21 +143,9 @@ static void App_Application_UpTaskFunc(void *args) {
  *   "targetSpeed" : 1600
  * }
  *
- * 实现步骤：
- *   1、while(1) 死循环：
- *      a. 定义 char* datas = NULL; uint16_t size = 0;
- *      b. 调用 Common_Buffer_Read(downBuffer, &datas, &size) 从下行缓冲读数据
- *      c. 如果 size > 0：
- *
- *         // 2、解析 JSON
- *         - 调用 cJSON_ParseWithLength(datas, size) 解析 JSON
- *         - 如果返回 NULL，log_info 打印 "json解析失败"，continue
- *
- *         // 3、提取公共字段 type 和 id
- *         - 调用 cJSON_GetObjectItemCaseSensitive 获取 "type" 字段
- *         - 调用 cJSON_GetObjectItemCaseSensitive 获取 "id" 字段
- *         - 校验 type 必须是 String 类型，id 必须是 Number 类型
- *         - 如果校验失败，cJSON_Delete(root) 释放 JSON，continue
+
+
+
  *
  *         // 4、根据 type 判断是 set（设置）还是 get（查询）
  *         - 使用 strcmp(type->valuestring, "set") 比较
@@ -209,4 +198,46 @@ static void App_Application_UpTaskFunc(void *args) {
  */
 static void App_Application_DownTaskFunc(void *args) {
   // TODO: 按照上述步骤实现下行任务
+  /**
+   * 实现步骤：
+ *   1、while(1) 死循环：
+ *      a. 定义 char* datas = NULL; uint16_t size = 0;
+ *      b. 调用 Common_Buffer_Read(downBuffer, &datas, &size) 从下行缓冲读数据
+ *      c. 如果 size > 0：
+ *
+   *         // 2、解析 JSON
+ *         - 调用 cJSON_ParseWithLength(datas, size) 解析 JSON
+ *         - 如果返回 NULL，log_info 打印 "json解析失败"，continue
+ *
+   *         // 3、提取公共字段 type 和 id
+ *         - 调用 cJSON_GetObjectItemCaseSensitive 获取 "type" 字段
+ *         - 调用 cJSON_GetObjectItemCaseSensitive 获取 "id" 字段
+ *         - 校验 type 必须是 String 类型，id 必须是 Number 类型
+ *         - 如果校验失败，cJSON_Delete(root) 释放 JSON，continue
+  */
+
+  while (1) {
+
+    // Read Data
+    char* datas = NULL;
+    uint16_t size = 0;
+    Common_Buffer_Read(downBuffer, &datas, &size);
+    if (size > 0) {
+        cJSON_ParseWithLength(datas, size);
+        if (datas == NULL) {
+            log_info("JSON Parse Failed!!!");
+            continue;
+        }
+    }
+
+   cJSON* type = cJSON_GetObjectItemCaseSensitive(datas, "type");
+    cJSON* id = cJSON_GetObjectItemCaseSensitive(datas, "id");
+    if (!cJSON_IsString(type) || !cJSON_IsNumber(id) || type != NULL || id != NULL) {
+        log_info("cJSON does not exsit or type error...");
+        cJSON_Delete(root);
+        continue;
+    }
+
+
+  }
 }
