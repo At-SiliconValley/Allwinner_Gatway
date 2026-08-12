@@ -2,6 +2,7 @@
 #include <bits/posix1_lim.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 // 全局双缓冲：上行缓冲（modbus→MQTT）、下行缓冲（MQTT→modbus）
 static DoubleBuffer *upBuffer;
@@ -147,26 +148,7 @@ static void App_Application_UpTaskFunc(void *args) {
 
 
  *
- *         // 4、根据 type 判断是 set（设置）还是 get（查询）
- *         - 使用 strcmp(type->valuestring, "set") 比较
- *
- *         // 4a、如果是 "set"（设置模式）：
- *            - 提取 "is_start" 字段（Number 类型）
- *            - 提取 "targetAngle" 字段（Number 类型）
- *            - 提取 "targetSpeed" 字段（Number 类型）
- *            - 校验以上三个字段都存在且类型正确
- *            - 定义 Float2U16 fx（联合体：float 和 uint16_t[2] 共享内存）
- *            - 发送目标速度：
- *              fx.data = (float)targetSpeed->valuedouble
- *              调用 Driver_Modbus_WriteHoldRegisters(id->valueint,
- * TARGET_SPEED_ADDR, 2, fx.arr)
- *            - 发送目标角度：
- *              fx.data = (float)targetAngle->valuedouble
- *              调用 Driver_Modbus_WriteHoldRegisters(id->valueint,
- * TARGET_ANGLE_ADDR, 2, fx.arr)
- *            - 启动/停止电机：
- *              调用 Driver_Modbus_WriteSingleCoil(id->valueint,
- * START_MOTOR_ADDR, isStart->valueint)
+
  *
  *         // 4b、如果是 "get"（查询模式）：
  *            - 调用 cJSON_CreateObject() 创建返回 JSON 对象
@@ -237,6 +219,44 @@ static void App_Application_DownTaskFunc(void *args) {
         cJSON_Delete(root);
         continue;
     }
+
+
+/**
+ *         // 4、根据 type 判断是 set（设置）还是 get（查询）
+ *         - 使用 strcmp(type->valuestring, "set") 比较
+*/ 
+    if (strcmp(type, "set") == 0) {
+      cJSON* is_start = cJSON_GetObjectItemCaseSensitive(root, "is_start");
+      cJSON* targetAngle = cJSON_GetObjectItemCaseSensitive(targetAngle, "targetAngle");
+      cJSON* targetSpeed = cJSON_GetObjectItemCaseSensitive(targetSpeed, "targetSpeed");
+      
+      if ( !cJSON_IsString(is_start) || !cJSON_IsNumber(targetAngle || targetSpeed) || ( is_start | targetAngle | targetSpeed) == NULL ) {
+        Float2U16 fx;
+        fx.data = (float)targetSpeed->valuedouble;
+      }
+    } else {
+
+      ;
+    }
+ /*
+ *         // 4a、如果是 "set"（设置模式）：
+ *            - 提取 "is_start" 字段（Number 类型）
+ *            - 提取 "targetAngle" 字段（Number 类型）
+ *            - 提取 "targetSpeed" 字段（Number 类型）
+ *            - 校验以上三个字段都存在且类型正确
+ *            - 定义 Float2U16 fx（联合体：float 和 uint16_t[2] 共享内存）
+ *            - 发送目标速度：
+ *              fx.data = (float)targetSpeed->valuedouble
+ *              调用 Driver_Modbus_WriteHoldRegisters(id->valueint,
+ * TARGET_SPEED_ADDR, 2, fx.arr)
+ *            - 发送目标角度：
+ *              fx.data = (float)targetAngle->valuedouble
+ *              调用 Driver_Modbus_WriteHoldRegisters(id->valueint,
+ * TARGET_ANGLE_ADDR, 2, fx.arr)
+ *            - 启动/停止电机：
+ *              调用 Driver_Modbus_WriteSingleCoil(id->valueint,
+ * START_MOTOR_ADDR, isStart->valueint)
+*/
 
 
   }
