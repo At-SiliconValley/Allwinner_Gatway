@@ -13,7 +13,7 @@
 static size_t write_json_cb(char *ptr, size_t size, size_t nmemb, void *stream)
 {
     // 1. 把 stream 转成 MemoryBuffer* 类型
-
+    (MemoryBuffer*)stream;
     // 2. 用 realloc 扩容 response 缓冲区，新大小 = 原大小 + nmemb + 1（+1给'\0'）
 
     // 3. 检查 realloc 是否成功，失败则 perror 打印错误并 return 0
@@ -40,7 +40,7 @@ ComStatus Driver_Http_GetJson(char *url, MemoryBuffer *mem)
 {
     // 1. 调用 curl_global_init(CURL_GLOBAL_ALL) 全局初始化libcurl
     //    检查返回值是否为 CURLE_OK，失败则 perror 并 return COM_FAIL
-
+    
     // 2. 调用 curl_easy_init() 初始化一个CURL句柄
     //    检查返回值是否为 NULL
 
