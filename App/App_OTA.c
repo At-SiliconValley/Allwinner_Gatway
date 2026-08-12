@@ -111,7 +111,7 @@ static void App_OTA_CheckVersion(void)
         log_info("固件完整...");
         // 5、重启[后续在linux中会有一个自启脚本,通过脚本切换新版本固件运行]
         free(shaStr);
-        //reboot(RB_AUTOBOOT);
+        reboot(RB_AUTOBOOT);
 
     }else{
         free(shaStr);
