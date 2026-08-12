@@ -3,7 +3,6 @@
 #include "sys/wait.h"
 int main(void){
 
-
     log_info("当前进程是:%d",getpid());
 
     //复制进程
