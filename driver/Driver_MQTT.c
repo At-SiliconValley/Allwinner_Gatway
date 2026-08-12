@@ -95,7 +95,7 @@ ComStatus Driver_MQTT_Init(MqttReceiveCallback rcb)
     res = MQTTClient_connect(client, &conn_opts);
     if (res != MQTTCLIENT_SUCCESS)
     {
-        log_info("mqtt client connect server fail");
+        perror("mqtt client connect server fail");
         return COM_FAIL;
     }
     // 4、订阅topic

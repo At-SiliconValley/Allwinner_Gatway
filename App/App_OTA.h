@@ -9,6 +9,7 @@
 #include "openssl/sha.h"
 #include "sys/reboot.h"
 #include "time.h"
+#include "signal.h"
 
 void App_OTA_Run(void);
 

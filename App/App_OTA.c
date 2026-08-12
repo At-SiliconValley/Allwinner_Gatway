@@ -3,6 +3,7 @@
 #define MINOR 1
 #define PATCH 0
 
+static bool ota_is_running = true;
 
 /**
  * @brief 检测是否存在新版本固件
@@ -39,7 +40,7 @@ static bool App_OTA_IsNewVersion(char *json, size_t size, char **shaStr)
         (major->valueint == MAJOR && minor->valueint > MINOR) ||
         (major->valueint == MAJOR && minor->valueint == MINOR && patch->valueint > PATCH))
     {
-        log_info("检测到有新版本");
+        log_info("检测到有新版本,当前版本[%d.%d.%d] 新版本[%d.%d.%d]",MAJOR,MINOR,PATCH,major->valueint,minor->valueint,patch->valueint);
         *shaStr = (char*)malloc( strlen(sha1->valuestring) );
         memcpy(*shaStr,sha1->valuestring, strlen(sha1->valuestring));
         cJSON_Delete(root);
@@ -83,6 +84,7 @@ static void App_OTA_CheckVersion(void)
         return;
     }
 
+    //初始化SHA上下文
     SHA_CTX ctx;
     SHA1_Init(&ctx);
 
@@ -93,7 +95,7 @@ static void App_OTA_CheckVersion(void)
         SHA1_Update( &ctx, (void*)datas, len);
     }
     //根据上下文数据生成hash码
-    char hashCode[ SHA_DIGEST_LENGTH ] = {0};
+    uint8_t hashCode[ SHA_DIGEST_LENGTH ] = {0};
     //[0x01,0x05,0xA1]
     SHA1_Final( hashCode, &ctx );
 
@@ -117,12 +119,21 @@ static void App_OTA_CheckVersion(void)
     }
     
 }
+
+
+void App_OTA_Exit (int code){
+    ota_is_running = false;
+}
 void App_OTA_Run(void)
 {
     //先开机自检
     App_OTA_CheckVersion();
+
+    //捕获信号
+    signal( SIGINT, App_OTA_Exit );
+    signal( SIGTERM, App_OTA_Exit );
     
-    while(1){
+    while(ota_is_running){
 
         //获取当前时间
         time_t t = time(NULL);
@@ -135,6 +146,5 @@ void App_OTA_Run(void)
         }
 
         sleep( 3600 );
-        
     }
 }
