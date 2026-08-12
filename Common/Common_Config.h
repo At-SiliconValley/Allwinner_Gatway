@@ -17,7 +17,12 @@ typedef union
 }Float2U16 ;
 
 
-#define HOST_NAME "192.168.50.49"
+#define HOST_NAME "192.168.50.48"
+
+#define VERSION_PATH ("http://" HOST_NAME ":8000/server/version.json")
+#define FIRMWARE_PATH ("http://" HOST_NAME ":8000/server/gateway")
+#define FIRMWARE_SAVE_PATH "/usr/bin/gateway.update"
+
 //ws://host:port
 #define MQTT_SERVER_URL ("ws://" HOST_NAME ":8083")
 
